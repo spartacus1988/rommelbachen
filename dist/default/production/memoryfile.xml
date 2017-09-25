@@ -3,15 +3,15 @@
   <executable name="dist/default/production/rommelbachen.X.production.hex">
     <memory name="program">
       <units>words</units>
-      <length>512</length>
-      <used>36</used>
-      <free>476</free>
+      <length>1024</length>
+      <used>551</used>
+      <free>473</free>
     </memory>
     <memory name="data">
       <units>bytes</units>
-      <length>25</length>
-      <used>7</used>
-      <free>18</free>
+      <length>64</length>
+      <used>52</used>
+      <free>12</free>
     </memory>
   </executable>
 </project>

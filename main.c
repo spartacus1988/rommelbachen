@@ -1,43 +1,57 @@
-
-
 #include <htc.h>
-//#define _XTAL_FREQ 4000000
-// PIC12F508 Configuration Bit Settings
-// CONFIG
-//#pragma config OSC = ExtRC      // Oscillator Selection bits (external RC oscillator)
-//#pragma config WDT = ON         // Watchdog Timer Enable bit (WDT enabled)
-#pragma config CP = OFF         // Code Protection bit (Code protection off)
-#pragma config MCLRE = ON       // GP3/MCLR Pin Function Select bit (GP3/MCLR pin function is MCLR)
- 
 #include <stdio.h> 
 #include <stdlib.h>
 #include <xc.h>
-#pragma config OSC = IntRC 
-#pragma config WDT = OFF 
-#pragma config CP = OFF 
-#pragma config MCLRE = ON
+
+// CONFIG
+#pragma config FOSC = INTRCIO   // Oscillator Selection bits (INTOSC oscillator: I/O function on GP4/OSC2/CLKOUT pin, I/O function on GP5/OSC1/CLKIN)
+#pragma config WDTE = OFF       // Watchdog Timer Enable bit (WDT disabled)
+#pragma config PWRTE = OFF      // Power-Up Timer Enable bit (PWRT disabled)
+#pragma config MCLRE = OFF      // GP3/MCLR pin function select (GP3/MCLR pin function is digital I/O, MCLR internally tied to VDD)
+#pragma config BOREN = ON       // Brown-out Detect Enable bit (BOD enabled)
+#pragma config CP = OFF         // Code Protection bit (Program Memory code protection is disabled)
+#pragma config CPD = OFF // Data Code Protection bit (Data memory code protection is disabled
+
 #define _XTAL_FREQ 4000000
 
 
-
-
-
+ void SetPwmValue(unsigned int pwm)
+    {
+       GPIObits.GP5 = 1;
+        __delay_ms(pwm);
+    
+        GPIObits.GP5 = 0;   
+        __delay_ms(10);
+    }
+ 
 
 void main()
 {
-    OPTION = 0b00000000; //with out this gpio 2 will not run 
-    TRISGPIO = 0b000000; //setting all of my pins to outputs (gpio3 is input only)
-    
-    
-  while(1)
-  { 
-
-   GPIObits.GP0 = 1;
-    __delay_ms(1000);
-    
-   GPIObits.GP0 = 0;   
-    __delay_ms(1000);
    
+	GPIO 	= 0x00;
+    TRISIO 	= 0x1F;			//	Making pin GP5 as output and all others input
+    CMCON	= 0x07;			// Disabling comparator
+    IOC 	= 0x00;			// Disabling Interrupt on change on all pins
+    OPTION_REG = 0x80;      // Disable pull-up resistors, Interpt on falling edge on GP2/INT pin
+    
+    
+    unsigned int pwm =0;
+    
+    while(1)
+    { 
+        
+        
+       // GPIObits.GP5 = 1;
+       //__delay_ms(10);
+    
+       // GPIObits.GP5 = 0;   
+       // __delay_ms(100);
    
-  }
+        
+        SetPwmValue(500);
+        
+                
+                
+   
+    }
 }
