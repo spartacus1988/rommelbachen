@@ -6,11 +6,11 @@
 // CONFIG
 #pragma config FOSC = INTRCIO   // Oscillator Selection bits (INTOSC oscillator: I/O function on GP4/OSC2/CLKOUT pin, I/O function on GP5/OSC1/CLKIN)
 #pragma config WDTE = OFF       // Watchdog Timer Enable bit (WDT disabled)
-#pragma config PWRTE = ON       // Power-Up Timer Enable bit (PWRT disabled)
+#pragma config PWRTE = OFF       // Power-Up Timer Enable bit (PWRT disabled)
 #pragma config MCLRE = ON       // GP3/MCLR pin function select (GP3/MCLR pin function is digital I/O, MCLR internally tied to VDD)
 #pragma config BOREN = ON       // Brown-out Detect Enable bit (BOD enabled)
 #pragma config CP = OFF         // Code Protection bit (Program Memory code protection is disabled)
-#pragma config CPD = OFF // Data Code Protection bit (Data memory code protection is disabled
+#pragma config CPD = OFF        // Data Code Protection bit (Data memory code protection is disabled
 
 #define _XTAL_FREQ 4000000
 
@@ -19,7 +19,7 @@ unsigned int ADC_get_state()
 {
     ADRESH = 0x00;
     ADRESL = 0x00;
-    ADCON0 = 0x8D;      //AN4
+    ADCON0 = 0x8D;      //AN3
     __delay_us(25);
     GO_nDONE = 1;
     while(GO_nDONE);
@@ -50,13 +50,13 @@ void adc_init()
 
  void SetPwmValue(unsigned int pwm_i)
     {
-       pwm_i = pwm_i / 10;
+       pwm_i = pwm_i / 100;
        
        GPIObits.GP5 = 1;
-        __delay_ms(pwm_i);
+        __delay_ms(10);
     
         GPIObits.GP5 = 0;   
-        __delay_ms(100);
+        __delay_ms(10);
     }
  
 
@@ -71,9 +71,12 @@ void main()
     OPTION_REG = 0x80;      // Disable pull-up resistors, Interpt on falling edge on GP2/INT pin
     
     
-    unsigned int pwm =0;
-    unsigned int state = 0;
-    
+    unsigned int pwm;
+    unsigned int state;
+    unsigned int state_switch;
+    unsigned int old_state;
+    unsigned int state_counter = 250;
+    unsigned int GPIOO;
     
     
      adc_init();
@@ -81,19 +84,49 @@ void main()
     
     while(1)
     {  
-        GPIObits.GP0 = 1;      //power on potentiomenrt
-   
-        state = ADC_get_state();
         
-        if(state > 512) 
+        
+        state_counter--;
+        GPIObits.GP0 = GPIOO;      //power on potentiomenrt
+   
+        if(state_counter ==0)
         {
-            pwm = ADC_get_PWM();
-            SetPwmValue(pwm);
+            state = ADC_get_state();
         }
-        else
-        {
-            __delay_ms(100);
+        
+        
+        
+             
+        if ((state > 512)&&(old_state<300))
+        {   
+            GPIOO=~GPIOO;    
         }
-                    
+        
+        
+        
+        
+  
+        
+        
+        //GPIObits.GP0 = 1;      //power on potentiomenrt
+   
+        
+        
+        
+        
+        //if(1)//(state_switch) 
+        //{
+            //pwm = ADC_get_PWM();
+            //SetPwmValue(100000);
+            //GPIObits.GP5 = 1;
+        //}
+        //else
+        //{
+        //     GPIObits.GP5 = 0;
+            //__delay_ms(3000);
+        //}
+        
+        old_state =  state;  
+        
     }
 }
