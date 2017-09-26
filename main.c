@@ -53,7 +53,7 @@ void adc_init()
        pwm_i = pwm_i / 100;
        
        GPIObits.GP5 = 1;
-        __delay_ms(10);
+        __delay_ms(pwm_i);
     
         GPIObits.GP5 = 0;   
         __delay_ms(10);
@@ -75,7 +75,8 @@ void main()
     unsigned int state;
     unsigned int state_switch;
     unsigned int old_state;
-    unsigned int state_counter = 250;
+    unsigned int state_counter = 150;
+    unsigned int pwm_counter = 150;
     unsigned int GPIOO;
     
     
@@ -87,23 +88,38 @@ void main()
         
         
         state_counter--;
-        GPIObits.GP0 = GPIOO;      //power on potentiomenrt
+        //GPIObits.GP0 = GPIOO;      //power on potentiomenrt
+        GPIObits.GP0 = 1;            //power on potentiomenrt
    
-        if(state_counter ==0)
+        if(state_counter == 0)
         {
+            //state_counter = 250;
             state = ADC_get_state();
+            pwm_counter = ADC_get_PWM();
+            pwm_counter = pwm_counter / 10;
         }
         
         
         
              
-        if ((state > 512)&&(old_state<300))
+        if ((state > 640)&&(old_state<100))
         {   
-            GPIOO=~GPIOO;    
+            GPIOO=~GPIOO;           
         }
         
         
-        
+        if(GPIOO)
+        {      
+            //GPIObits.GP0 = GPIOO;
+            //GPIObits.GP5 = GPIOO;
+           // SetPwmValue(0);
+        }
+        else
+        {
+            //GPIObits.GP0 = GPIOO;
+            //GPIObits.GP5 = GPIOO;
+            //SetPwmValue(0);
+        }
         
   
         
@@ -114,17 +130,28 @@ void main()
         
         
         
-        //if(1)//(state_switch) 
-        //{
+        if(!GPIOO)//(state_switch) 
+        {
+            pwm_counter--;
+            if(pwm_counter==0)
+            {
+               GPIObits.GP5 = 0; 
+            }
+            else 
+            {
+              GPIObits.GP5 = 1;   
+            }   
+            
             //pwm = ADC_get_PWM();
-            //SetPwmValue(100000);
+            //SetPwmValue(500);
             //GPIObits.GP5 = 1;
-        //}
-        //else
-        //{
-        //     GPIObits.GP5 = 0;
+        }
+        else
+        {
+            
+            //GPIObits.GP5 = 0;
             //__delay_ms(3000);
-        //}
+        }
         
         old_state =  state;  
         
