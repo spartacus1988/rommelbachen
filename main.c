@@ -65,7 +65,7 @@ void main()
     //__delay_ms(300);
     
 	GPIO 	= 0x00;
-    TRISIO 	= 0x1E;			//	Making pin GP0 and GP5 as output and all others input
+    TRISIO 	= 0x1A;			//	Making pin GP0 and GP5 and GP2 as output and all others input
     CMCON	= 0x07;			// Disabling comparator
     IOC 	= 0x00;			// Disabling Interrupt on change on all pins
     OPTION_REG = 0x80;      // Disable pull-up resistors, Interpt on falling edge on GP2/INT pin
@@ -76,8 +76,10 @@ void main()
     unsigned int state_switch;
     unsigned int old_state;
     unsigned int state_counter = 150;
-    unsigned int pwm_counter = 150;
-    unsigned int GPIOO;
+    unsigned int pwm_counter = 10;
+    unsigned int old_pwm_counter = 10;
+    unsigned int pwm_counter_xx = 1;
+    unsigned int GPIOO=0;
     
     
      adc_init();
@@ -90,21 +92,34 @@ void main()
         state_counter--;
         //GPIObits.GP0 = GPIOO;      //power on potentiomenrt
         GPIObits.GP0 = 1;            //power on potentiomenrt
+        GPIObits.GP2 = 0;            //power on potentiomenrt
    
         if(state_counter == 0)
         {
-            //state_counter = 250;
+            state_counter = 150;
             state = ADC_get_state();
             pwm_counter = ADC_get_PWM();
-            pwm_counter = pwm_counter / 10;
+            pwm_counter = pwm_counter / 100;
         }
         
         
+        //if((state_counter == 25)||(state_counter == 50)||(state_counter == 75)||(state_counter == 100)||(state_counter == 125)||(state_counter == 150))
+        //{
+            //pwm_counter = ADC_get_PWM();
+            //pwm_counter = pwm_counter / 100;
+        //}
+        
+        //pwm_counter_xx = pwm_counter / 100;
         
              
-        if ((state > 640)&&(old_state<100))
+        if ((state > 512)&&(old_state < 312))
         {   
-            GPIOO=~GPIOO;           
+           GPIOO=~GPIOO; 
+            //GPIOO=1;
+        }
+        else
+        {
+           // GPIOO = 0;
         }
         
         
@@ -112,7 +127,7 @@ void main()
         {      
             //GPIObits.GP0 = GPIOO;
             //GPIObits.GP5 = GPIOO;
-           // SetPwmValue(0);
+            //SetPwmValue(0);
         }
         else
         {
@@ -130,26 +145,43 @@ void main()
         
         
         
-        if(!GPIOO)//(state_switch) 
+        if(GPIOO)//(state_switch) 
         {
-            pwm_counter--;
-            if(pwm_counter==0)
-            {
-               GPIObits.GP5 = 0; 
-            }
-            else 
-            {
-              GPIObits.GP5 = 1;   
-            }   
+            old_pwm_counter = pwm_counter;
             
-            //pwm = ADC_get_PWM();
-            //SetPwmValue(500);
-            //GPIObits.GP5 = 1;
+            while(pwm_counter < 12)
+            {
+                if(pwm_counter > 10)
+                {
+                    GPIObits.GP5 = 1; 
+                }
+                else 
+                {
+                    GPIObits.GP5 = 0;   
+                }
+                
+                pwm_counter++;
+            }
+            
+            if(pwm_counter==12)
+            {
+               pwm_counter = old_pwm_counter; 
+            }
+            
+            
+            
+          //GPIObits.GP5 = 1;
+          //__delay_ms(pwm_counter);
+    
+          //GPIObits.GP5 = 0;   
+          //__delay_ms(5);
+            
+            
         }
         else
         {
             
-            //GPIObits.GP5 = 0;
+            GPIObits.GP5 = 0;
             //__delay_ms(3000);
         }
         
