@@ -78,7 +78,7 @@ void main()
     unsigned int state_counter = 150;
     unsigned int pwm_counter = 10;
     unsigned int old_pwm_counter = 10;
-    unsigned int pwm_counter_xx = 1;
+    unsigned int pwm_counter_xx = 1000;
     unsigned int GPIOO=0;
     
     
@@ -88,7 +88,7 @@ void main()
     while(1)
     {  
         
-        
+        pwm_counter_xx--;
         state_counter--;
         //GPIObits.GP0 = GPIOO;      //power on potentiomenrt
         GPIObits.GP0 = 1;            //power on potentiomenrt
@@ -98,16 +98,16 @@ void main()
         {
             state_counter = 150;
             state = ADC_get_state();
-            pwm_counter = ADC_get_PWM();
-            pwm_counter = pwm_counter / 100;
+            //pwm_counter = ADC_get_PWM();
+            //pwm_counter = pwm_counter / 100;
         }
         
         
-        //if((state_counter == 25)||(state_counter == 50)||(state_counter == 75)||(state_counter == 100)||(state_counter == 125)||(state_counter == 150))
-        //{
-            //pwm_counter = ADC_get_PWM();
-            //pwm_counter = pwm_counter / 100;
-        //}
+        if(pwm_counter_xx==0)//((state_counter == 25)||(state_counter == 50)||(state_counter == 75)||(state_counter == 100)||(state_counter == 125)||(state_counter == 150))
+        {
+            pwm_counter = ADC_get_PWM();
+            pwm_counter = pwm_counter / 100;
+        }
         
         //pwm_counter_xx = pwm_counter / 100;
         
@@ -145,10 +145,12 @@ void main()
         
         
         
-        if(GPIOO)//(state_switch) 
+        if((GPIOO)&&(pwm_counter_xx==0))//(state_switch) 
         {
-            old_pwm_counter = pwm_counter;
+            pwm_counter_xx = 1000 / pwm_counter;
+            //old_pwm_counter = pwm_counter;
             
+            /*
             while(pwm_counter < 12)
             {
                 if(pwm_counter > 10)
@@ -167,10 +169,10 @@ void main()
             {
                pwm_counter = old_pwm_counter; 
             }
+            */
             
             
-            
-          //GPIObits.GP5 = 1;
+          GPIObits.GP5 = 1;
           //__delay_ms(pwm_counter);
     
           //GPIObits.GP5 = 0;   
